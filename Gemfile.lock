@@ -1,0 +1,15 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    byebug (10.0.0)
+    colorize (0.8.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  byebug
+  colorize
+
+BUNDLED WITH
+   1.16.0
