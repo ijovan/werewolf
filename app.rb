@@ -3,7 +3,8 @@ require_relative 'game'
 
 RUNS = 1
 ROLE_COUNTS = {
-  Werewolf => 2, Villager => 6, Seer => 1, Healer => 1, Mason => 2
+  Werewolf => 2, Villager => 6, Seer => 1,
+  Healer => 1, Mason => 2, Scapegoat => 1
 }
 
 results = {:innocents => 0, :werewolves => 0}

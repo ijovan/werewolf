@@ -1,4 +1,4 @@
-ROLES = ["werewolf", "villager", "healer", "seer", "mason"]
+ROLES = ["werewolf", "villager", "healer", "seer", "mason", "scapegoat"]
 ROLES.each { |role| require_relative "roles/#{role}" }
 
 class Game
@@ -9,7 +9,7 @@ class Game
     "Judy", "Mel", "Sylvia", "Pat", "George", "Nick", "Mat", "Monica"
   ]
 
-  INNOCENT_TYPES = [Villager, Healer, Seer, Mason]
+  INNOCENT_TYPES = [Villager, Healer, Seer, Mason, Scapegoat]
 
   LYNCH_LIMIT = 3
 
@@ -59,6 +59,10 @@ class Game
     select_by_type(Healer).first
   end
 
+  def scapegoat
+    select_by_type(Scapegoat).first
+  end
+
   def run
     while !@winner
       run_day
@@ -97,7 +101,16 @@ class Game
       return if @players.count < count
     end
 
-    puts "No lyching happened today"
+    if scapegoat
+      puts "No lynching votes have passed - " +
+        "instead, #{scapegoat} is killed"
+
+      @werewolf_victims << scapegoat
+
+      remove_player scapegoat
+    else
+      puts "No lyching happened today"
+    end
   end
 
   def run_lynching_cycle
@@ -155,8 +168,9 @@ class Game
   def stats
     tokens = [
       werewolves.count.to_s.red, villagers.count.to_s.green,
-      seer ? "S".green : nil, healer ? "H".green : nil,
-      masons.any? ? ("M".green * masons.count) : nil
+      seer ? "Se".green : nil, healer ? "H".green : nil,
+      masons.any? ? ("M".green * masons.count) : nil,
+      scapegoat ? "Sc".green : nil
     ]
 
     tokens.compact.join(" ")
