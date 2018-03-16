@@ -1,5 +1,5 @@
 ROLES = [
-  "werewolf", "villager", "healer", "seer",
+  "werewolf", "villager", "healer", "seer", "miller",
   "mason", "scapegoat", "rabble_rouser", "alpha_werewolf"
 ]
 ROLES.each { |role| require_relative "roles/#{role}" }
@@ -12,7 +12,9 @@ class Game
     "Judy", "Mel", "Sylvia", "Pat", "George", "Nick", "Mat", "Monica"
   ]
 
-  INNOCENT_TYPES = [Villager, Healer, Seer, Mason, Scapegoat, RabbleRouser]
+  INNOCENT_TYPES = [
+    Villager, Healer, Seer, Mason, Scapegoat, RabbleRouser, Miller
+  ]
 
   LYNCH_LIMIT = 3
 
@@ -78,6 +80,10 @@ class Game
     select_by_type(RabbleRouser).first
   end
 
+  def miller
+    select_by_type(Miller).first
+  end
+
   def run
     while !@winner
       run_day
@@ -130,7 +136,7 @@ class Game
 
       remove_player scapegoat
     else
-      puts "No lyching happened today"
+      puts "No lyching happened in this round"
     end
   end
 
@@ -188,11 +194,15 @@ class Game
 
   def stats
     tokens = [
-      werewolves.count.to_s.red, alpha_werewolf ? "A".red : nil,
-      villagers.count.to_s.green, seer ? "Se".green : nil,
+      werewolves.count.to_s.red,
+      alpha_werewolf ? "A".red : nil,
+      villagers.count.to_s.green,
+      seer ? "Se".green : nil,
       healer ? "H".green : nil,
-      masons.any? ? ("M".green * masons.count) : nil,
-      scapegoat ? "Sc".green : nil, rabble_rouser ? "R".green : nil
+      masons.any? ? ("Ma".green * masons.count) : nil,
+      scapegoat ? "Sc".green : nil,
+      rabble_rouser ? "R".green : nil,
+      miller ? "Mi".green : nil
     ]
 
     tokens.compact.join(" ")

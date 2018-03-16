@@ -43,7 +43,7 @@ class Seer < Villager
 
     target = known_werewolves.sample
 
-    "#{self} knows that #{target} is a werewolf and accuses him"
+    puts "#{self} believes that #{target} is a werewolf and accuses him"
 
     target
   end
@@ -52,13 +52,13 @@ class Seer < Villager
     if known_innocents.include? target
       if target != self
         puts "#{self} votes to save #{target}, " +
-          "whom he knows to be innocent"
+          "whom he believes to be innocent"
       end
 
       false
     elsif known_werewolves.include?(target)
       puts "#{self} votes to lynch #{target}, " +
-        "whom he knows to be a werewolf"
+        "whom he believes to be a werewolf"
 
       true
     else
@@ -69,10 +69,10 @@ class Seer < Villager
   private
 
   def known_werewolves
-    @knowledge.select { |player| player.class == Werewolf }
+    @knowledge.select { |player| [Werewolf, Miller].include? player.class }
   end
 
   def known_innocents
-    @knowledge.select { |player| player.class != Werewolf }
+    @knowledge.select { |player| ![Werewolf, Miller].include? player.class }
   end
 end
