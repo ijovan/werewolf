@@ -1,5 +1,5 @@
 ROLES = [
-  "werewolf", "villager", "healer", "seer", "miller",
+  "werewolf", "villager", "healer", "seer", "miller", "hunter",
   "mason", "scapegoat", "rabble_rouser", "alpha_werewolf"
 ]
 ROLES.each { |role| require_relative "roles/#{role}" }
@@ -13,12 +13,12 @@ class Game
   ]
 
   INNOCENT_TYPES = [
-    Villager, Healer, Seer, Mason, Scapegoat, RabbleRouser, Miller
+    Villager, Healer, Seer, Mason, Scapegoat, RabbleRouser, Miller, Hunter
   ]
 
   LYNCH_LIMIT = 3
 
-  attr_reader :players, :winner, :werewolf_victims
+  attr_reader :players, :winner, :innocent_victims
 
   def initialize(role_counts)
     if role_counts.values.inject(:+) > NAMES.count
@@ -26,7 +26,7 @@ class Game
     end
 
     @players = []
-    @werewolf_victims = []
+    @innocent_victims = []
     @day = 1
 
     names = NAMES.shuffle
@@ -72,6 +72,10 @@ class Game
     select_by_type(Healer).first
   end
 
+  def hunter
+    select_by_type(Hunter).first
+  end
+
   def scapegoat
     select_by_type(Scapegoat).first
   end
@@ -103,6 +107,8 @@ class Game
 
     run_lynching
 
+    return if @winner
+
     if rabble_rouser
       puts; puts "#{rabble_rouser} entices the crowd into another lynch"
 
@@ -133,7 +139,7 @@ class Game
       puts "No lynching votes have passed - " +
         "instead, #{scapegoat} is killed"
 
-      @werewolf_victims << scapegoat
+      @innocent_victims << scapegoat
 
       remove_player scapegoat
     else
@@ -187,7 +193,7 @@ class Game
     else
       puts "#{target} has been killed by the werewolves"
 
-      @werewolf_victims << target
+      @innocent_victims << target
 
       remove_player target
     end
@@ -199,7 +205,8 @@ class Game
       alpha_werewolf ? "A".red : nil,
       villagers.count.to_s.green,
       seers.any? ? ("Se".green * seers.count) : nil,
-      healer ? "H".green : nil,
+      healer ? "He".green : nil,
+      hunter ? "Hu".green : nil,
       masons.any? ? ("Ma".green * masons.count) : nil,
       scapegoat ? "Sc".green : nil,
       rabble_rouser ? "R".green : nil,
@@ -210,6 +217,12 @@ class Game
   end
 
   def remove_player(player)
+    if player.class == Hunter
+      @players.delete player.shoot
+
+      @innocent_victims << player unless @innocent_victims.include? player
+    end
+
     @players.delete player
     @players.each(&:sync)
 

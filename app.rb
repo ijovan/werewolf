@@ -3,7 +3,7 @@ require_relative 'game'
 
 RUNS = 1
 ROLE_COUNTS = {
-  Werewolf => 2, AlphaWerewolf => 1, Villager => 2, Seer => 1,
+  Werewolf => 2, AlphaWerewolf => 1, Villager => 2, Seer => 1, Hunter => 1,
   Healer => 1, Mason => 2, Scapegoat => 1, RabbleRouser => 1, Miller => 1
 }
 

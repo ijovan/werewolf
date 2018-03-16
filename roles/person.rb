@@ -49,7 +49,7 @@ class Person
   def suspicion_level(target)
     votes = target.vote_history
 
-    innocents = known_innocents + @game.werewolf_victims
+    innocents = known_innocents + @game.innocent_victims
 
     intersection(votes[:lynch], innocents).count -
       intersection(votes[:no_lynch], innocents).count
