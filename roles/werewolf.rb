@@ -23,7 +23,7 @@ class Werewolf < Person
   end
 
   def accusation_target
-    candidates = @game.players - @game.werewolves
+    candidates = @game.players - @game.werewolf_pack
 
     target = candidates.shuffle.min { |player| suspicion_level player }
 
@@ -38,7 +38,7 @@ class Werewolf < Person
   end
 
   def vote_decision(target)
-    if @game.werewolves.include? target
+    if @game.werewolf_pack.include? target
       if target != self
         puts "#{self} votes to save #{target}, a fellow werewolf"
       end

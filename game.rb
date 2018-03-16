@@ -1,6 +1,6 @@
 ROLES = [
   "werewolf", "villager", "healer", "seer",
-  "mason", "scapegoat", "rabble_rouser"
+  "mason", "scapegoat", "rabble_rouser", "alpha_werewolf"
 ]
 ROLES.each { |role| require_relative "roles/#{role}" }
 
@@ -36,6 +36,14 @@ class Game
 
   def ids
     @players.map(&:id)
+  end
+
+  def werewolf_pack
+    ([alpha_werewolf] + werewolves).compact
+  end
+
+  def alpha_werewolf
+    select_by_type(AlphaWerewolf).first
   end
 
   def werewolves
@@ -165,7 +173,7 @@ class Game
   end
 
   def werewolf_kill
-    target = werewolves.first.kill_target
+    target = werewolf_pack.first.kill_target
 
     if healer && target == healer.target
       healer.save
@@ -180,8 +188,9 @@ class Game
 
   def stats
     tokens = [
-      werewolves.count.to_s.red, villagers.count.to_s.green,
-      seer ? "Se".green : nil, healer ? "H".green : nil,
+      werewolves.count.to_s.red, alpha_werewolf ? "A".red : nil,
+      villagers.count.to_s.green, seer ? "Se".green : nil,
+      healer ? "H".green : nil,
       masons.any? ? ("M".green * masons.count) : nil,
       scapegoat ? "Sc".green : nil, rabble_rouser ? "R".green : nil
     ]
@@ -201,9 +210,9 @@ class Game
   end
 
   def check_win_conditions
-    if werewolves.count == 0
+    if werewolf_pack.count == 0
       innocents_win
-    elsif werewolves.count >= innocents.count
+    elsif werewolf_pack.count >= innocents.count
       werewolves_win
     end
   end
