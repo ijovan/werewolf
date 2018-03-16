@@ -1,4 +1,5 @@
-require_relative 'player_types'
+ROLES = ["werewolf", "villager", "healer", "seer", "mason"]
+ROLES.each { |role| require_relative "roles/#{role}" }
 
 class Game
   class NotEnoughNamesError < StandardError; end
