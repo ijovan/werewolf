@@ -19,7 +19,7 @@ class Person
   def accuse
     target = accusation_target
 
-    @vote_history[:lynch] << target
+    @vote_history[:lynch] << target if target
 
     target
   end

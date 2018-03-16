@@ -12,22 +12,12 @@ class Villager < Person
 
     target = candidates.shuffle.max { |player| suspicion_level player }
 
-    unless target
-      safe_types = (Game::INNOCENT_TYPES - [Villager])
-
-      target = known_innocents
-        .reject { |player| safe_types.include? player.class }
-        .sample
-    end
-
     if target && suspicion_level(target) > average_suspicion
       puts "#{self} suspects that #{target} is a werewolf " +
         "and accuses him"
-    else
-      puts "#{self} has accused #{target}"
-    end
 
-    target
+      target
+    end
   end
 
   def vote_decision(target)

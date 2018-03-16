@@ -13,6 +13,9 @@ class Hunter < Villager
     if suspicion_level(target) > average_suspicion
       puts "#{self} fires off a shot before being killed - he kills " +
         "#{target}, whom he believed to be a werewolf"
+    else
+      puts "#{self} fires off a shot before being killed " +
+        "but doesn't hit anyone"
     end
 
     target

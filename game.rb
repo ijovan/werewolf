@@ -12,11 +12,12 @@ class Game
     "Judy", "Mel", "Sylvia", "Pat", "George", "Nick", "Mat", "Monica"
   ]
 
+  WEREWOLF_TYPES = [Werewolf, AlphaWerewolf]
   INNOCENT_TYPES = [
     Villager, Healer, Seer, Mason, Scapegoat, RabbleRouser, Miller, Hunter
   ]
 
-  LYNCH_LIMIT = 3
+  LYNCH_LIMIT = 2
 
   attr_reader :players, :winner, :innocent_victims
 
@@ -156,9 +157,11 @@ class Game
   end
 
   def propose_lynch_target
-    accuser = players.shuffle.pop
+    while !@lynch_target
+      accuser = players.shuffle.pop
 
-    @lynch_target = accuser.accuse
+      @lynch_target = accuser.accuse
+    end
 
     @vote = { accuser => true }
   end
