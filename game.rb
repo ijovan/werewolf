@@ -239,9 +239,23 @@ class Game
   def check_win_conditions
     if werewolf_pack.count == 0
       innocents_win
-    elsif werewolf_pack.count >= innocents.count
+    elsif werewolf_pack.count > innocents.count
       werewolves_win
+    elsif werewolf_pack.count == innocents.count
+      if innocents.count == 1 && innocents.first.class == Hunter
+        draw
+      else
+        werewolves_win
+      end
     end
+  end
+
+  def draw
+    puts
+    puts "The remaining werewolf and hunter kill each other"
+    puts "It's a draw".yellow
+
+    @winner = :draw
   end
 
   def innocents_win

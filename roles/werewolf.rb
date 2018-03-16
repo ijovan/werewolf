@@ -6,7 +6,9 @@ class Werewolf < Person
   end
 
   def kill_target
-    target = known_innocents.min { |player| suspicion_level(player) }
+    target = known_innocents.shuffle.min do |player|
+      suspicion_level(player)
+    end
 
     if suspicion_level(target) < average_suspicion
       puts "Werewolves target #{target}, suspecting him of being " +

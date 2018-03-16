@@ -43,7 +43,13 @@ class Seer < Villager
 
     target = known_werewolves.sample
 
-    puts "#{self} believes that #{target} is a werewolf and accuses him"
+    if target.class == Miller
+      puts "#{self} erroneously believes that #{target} is a werewolf " +
+        "and accuses him"
+    else
+      puts "#{self} correctly believes that #{target} is a werewolf " +
+        "and accuses him"
+    end
 
     target
   end
@@ -51,14 +57,24 @@ class Seer < Villager
   def vote_decision(target)
     if known_innocents.include? target
       if target != self
-        puts "#{self} votes to save #{target}, " +
-          "whom he believes to be innocent"
+        if target.class == AlphaWerewolf
+          puts "#{self} votes to save #{target}, " +
+            "whom he erroneously believes to be innocent"
+        else
+          puts "#{self} votes to save #{target}, " +
+            "whom he correctly believes to be innocent"
+        end
       end
 
       false
     elsif known_werewolves.include?(target)
-      puts "#{self} votes to lynch #{target}, " +
-        "whom he believes to be a werewolf"
+      if target.class == Miller
+        puts "#{self} votes to lynch #{target}, " +
+          "whom he erroneously believes to be a werewolf"
+      else
+        puts "#{self} votes to lynch #{target}, " +
+          "whom he correctly believes to be a werewolf"
+      end
 
       true
     else

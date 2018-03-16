@@ -7,7 +7,7 @@ ROLE_COUNTS = {
   Healer => 1, Mason => 2, Scapegoat => 1, RabbleRouser => 1, Miller => 1
 }
 
-results = {:innocents => 0, :werewolves => 0}
+results = { :innocents => 0, :werewolves => 0, :draw => 0 }
 
 RUNS.times do
   game = Game.new ROLE_COUNTS
@@ -21,4 +21,5 @@ end
 
 puts
 puts "Innocents: #{results[:innocents]}".green + ", " +
-  "Werewolves: #{results[:werewolves]}".red
+  "Werewolves: #{results[:werewolves]}".red + ", " +
+  "Draw: #{results[:draw]}".yellow

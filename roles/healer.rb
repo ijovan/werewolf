@@ -36,6 +36,7 @@ class Healer < Villager
 
   def save
     @known_innocents << @target
+    @known_innocents.uniq!
 
     puts "#{@target} has been saved by #{self}"
   end
