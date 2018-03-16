@@ -64,8 +64,8 @@ class Game
     select_by_type(Mason)
   end
 
-  def seer
-    select_by_type(Seer).first
+  def seers
+    select_by_type(Seer)
   end
 
   def healer
@@ -114,7 +114,8 @@ class Game
     puts; puts "--- Night #{@day} begins --- #{stats}"; puts
 
     healer.heal if healer
-    seer.see if seer
+
+    seers.each(&:see)
 
     werewolf_kill
   end
@@ -197,7 +198,7 @@ class Game
       werewolves.count.to_s.red,
       alpha_werewolf ? "A".red : nil,
       villagers.count.to_s.green,
-      seer ? "Se".green : nil,
+      seers.any? ? ("Se".green * seers.count) : nil,
       healer ? "H".green : nil,
       masons.any? ? ("Ma".green * masons.count) : nil,
       scapegoat ? "Sc".green : nil,
