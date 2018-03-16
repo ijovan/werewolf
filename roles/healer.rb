@@ -18,9 +18,20 @@ class Healer < Villager
   end
 
   def heal
-    @target = @game.players.sample
+    average = average_suspicion
+
+    assumed_innocents = @game.players.select do |player|
+      player == self || suspicion_level(player) <= average
+    end
+
+    @target = assumed_innocents.sample
 
     puts "#{@target} is being protected by #{self}"
+
+    if @known_innocents.count > 1
+      puts "#{self} currenty knows: " +
+        (@known_innocents - [self]).join(", ")
+    end
   end
 
   def save
@@ -31,8 +42,8 @@ class Healer < Villager
 
   protected
 
-  def accusation_target
-    (@game.players - @known_innocents).sample
+  def known_innocents
+    @known_innocents
   end
 
   def vote_decision(target)
@@ -44,7 +55,7 @@ class Healer < Villager
 
       false
     else
-      random_boolean
+      super(target)
     end
   end
 end

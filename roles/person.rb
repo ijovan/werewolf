@@ -38,18 +38,38 @@ class Person
 
   protected
 
+  def average_suspicion
+    players = @game.players
+
+    suspicion_levels = players.map { |player| suspicion_level(player).to_f }
+
+    suspicion_levels.inject(:+) / players.count
+  end
+
+  def suspicion_level(target)
+    votes = target.vote_history
+
+    innocents = known_innocents + @game.werewolf_victims
+
+    intersection(votes[:lynch], innocents).count -
+      intersection(votes[:no_lynch], innocents).count
+  end
+
+  def intersection(array_1, array_2)
+    array_1.select { |element| array_2.include? element }
+  end
+
+  def known_innocents
+    []
+  end
+
   def accusation_target
-    (@game.players - [self]).sample
   end
 
   def vote_decision(target)
-    return false if target == self
-
-    random_boolean
   end
 
   def random_boolean
     [true, false].sample
   end
 end
-

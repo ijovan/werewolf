@@ -7,8 +7,8 @@ class Mason < Villager
 
   protected
 
-  def accusation_target
-    (@game.players - @game.masons).sample
+  def known_innocents
+    @game.masons
   end
 
   def vote_decision(target)
@@ -19,7 +19,7 @@ class Mason < Villager
 
       false
     else
-      random_boolean
+      super(target)
     end
   end
 end

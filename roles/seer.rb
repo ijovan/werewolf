@@ -22,22 +22,30 @@ class Seer < Villager
 
     return if candidates.none?
 
-    target = candidates.sample
+    target = candidates.shuffle.max { |player| suspicion_level(player) }
+
+    if suspicion_level(target) > average_suspicion
+      puts "#{self} suspects #{target} of being a werewolf and " +
+        "investigates him"
+    else
+      puts "#{target} is being investigated by #{self}"
+    end
 
     @knowledge << target
 
-    puts "#{target} is being investigated by #{self}"
     puts "#{self} currently knows: #{(@knowledge - [self]).join(", ")}"
   end
 
   protected
 
   def accusation_target
-    if known_werewolves.any?
-      known_werewolves.sample
-    else
-      (@game.players - known_innocents).sample
-    end
+    return super if known_werewolves.none?
+
+    target = known_werewolves.sample
+
+    "#{self} knows that #{target} is a werewolf and accuses him"
+
+    target
   end
 
   def vote_decision(target)

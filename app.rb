@@ -2,14 +2,14 @@ require 'byebug'
 require_relative 'game'
 
 RUNS = 1
-ROLES = {
+ROLE_COUNTS = {
   Werewolf => 2, Villager => 6, Seer => 1, Healer => 1, Mason => 2
 }
 
 results = {:innocents => 0, :werewolves => 0}
 
 RUNS.times do
-  game = Game.new ROLES
+  game = Game.new ROLE_COUNTS
 
   puts "Players: " + game.players.map(&:to_s).join(", ")
 

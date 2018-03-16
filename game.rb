@@ -11,7 +11,9 @@ class Game
 
   INNOCENT_TYPES = [Villager, Healer, Seer, Mason]
 
-  attr_reader :players, :winner
+  LYNCH_LIMIT = 3
+
+  attr_reader :players, :winner, :werewolf_victims
 
   def initialize(role_counts)
     if role_counts.values.inject(:+) > NAMES.count
@@ -19,6 +21,7 @@ class Game
     end
 
     @players = []
+    @werewolf_victims = []
     @day = 1
 
     names = NAMES.shuffle
@@ -88,7 +91,13 @@ class Game
   def run_lynching
     count = @players.count
 
-    run_lynching_cycle while @players.count == count
+    LYNCH_LIMIT.times do
+      run_lynching_cycle
+
+      return if @players.count < count
+    end
+
+    puts "No lyching happened today"
   end
 
   def run_lynching_cycle
@@ -103,8 +112,6 @@ class Game
     accuser = players.shuffle.pop
 
     @lynch_target = accuser.accuse
-
-    puts "#{accuser} accused #{@lynch_target}"
 
     @vote = { accuser => true }
   end
@@ -132,12 +139,14 @@ class Game
   end
 
   def werewolf_kill
-    target = innocents.sample
+    target = werewolves.first.kill_target
 
     if healer && target == healer.target
       healer.save
     else
       puts "#{target} has been killed by the werewolves"
+
+      @werewolf_victims << target
 
       remove_player target
     end
