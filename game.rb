@@ -91,39 +91,43 @@ class Game
   end
 
   def run_lynching_cycle
-    voters = players.shuffle
+    propose_lynch_target
 
-    propose_lynch_target voters.pop
-
-    voters.each { |voter| vote_lynch voter }
+    players.shuffle.each { |voter| vote_lynch voter }
 
     attempt_lynch
   end
 
-  def propose_lynch_target(accuser)
-    target = accuser.accuse
+  def propose_lynch_target
+    accuser = players.shuffle.pop
+
+    @lynch_target = accuser.accuse
+
+    puts "#{accuser} accused #{@lynch_target}"
 
     @vote = { accuser => true }
-    @accuser, @lynch_target = accuser, target
   end
 
   def vote_lynch(voter)
-    @vote[voter] = voter.vote(@lynch_target)
+    @vote[voter] ||= voter.vote(@lynch_target)
   end
 
   def attempt_lynch
-    vote_count = @vote.values.select { |value| value }.count
+    votes_for = @vote.values.select { |value| value }.count
+    votes_against = @players.count - votes_for
 
-    if vote_count > @players.count.to_f / 2
-      puts "#{@lynch_target} has been lynched on #{@accuser}'s proposal"
+    if votes_for > votes_against
+      puts "#{@lynch_target} has been lynched " +
+        "with #{votes_for} for and #{votes_against} against"
 
       remove_player @lynch_target
     else
-      puts "#{@lynch_target} survived #{@accuser}'s lynch proposal"
+      puts "#{@lynch_target} survived the lynch proposal " +
+        "with #{votes_for} for and #{votes_against} against"
     end
 
     @vote = {}
-    @lynch_target, @accuser = nil, nil
+    @lynch_target = nil
   end
 
   def werewolf_kill
@@ -132,7 +136,7 @@ class Game
     if healer && target == healer.target
       healer.save
     else
-      puts "#{target} has been killed"
+      puts "#{target} has been killed by the werewolves"
 
       remove_player target
     end
@@ -142,7 +146,7 @@ class Game
     tokens = [
       werewolves.count.to_s.red, villagers.count.to_s.green,
       seer ? "S".green : nil, healer ? "H".green : nil,
-      masons.any? ? "#{masons.count}M".green : nil
+      masons.any? ? ("M".green * masons.count) : nil
     ]
 
     tokens.compact.join(" ")
@@ -168,13 +172,17 @@ class Game
   end
 
   def innocents_win
-    puts; puts "Innocents win".green
+    puts
+    puts "There are no more werewolves left"
+    puts "Innocents win".green
 
     @winner = :innocents
   end
 
   def werewolves_win
-    puts; puts "Werewolves win".red
+    puts
+    puts "Werewolves come out and slaughter the remaining villagers"
+    "Werewolves win".red
 
     @winner = :werewolves
   end

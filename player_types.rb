@@ -36,7 +36,15 @@ class Werewolf < Person
   end
 
   def vote(target)
-    !@game.werewolves.include?(target)
+    if @game.werewolves.include? target
+      if target != self
+        puts "#{self} votes to save #{target}, a fellow werewolf"
+      end
+
+      false
+    else
+      true
+    end
   end
 end
 
@@ -60,7 +68,15 @@ class Mason < Person
   end
 
   def vote(target)
-    @game.masons.include?(target) ? false : random_boolean
+    if @game.masons.include? target
+      if target != self
+        puts "#{self} votes to save #{target}, a fellow mason"
+      end
+
+      false
+    else
+      random_boolean
+    end
   end
 end
 
@@ -90,20 +106,34 @@ class Seer < Person
   end
 
   def vote(target)
-    return false if known_innocents.include? target
+    if known_innocents.include? target
+      if target != self
+        puts "#{self} votes to save #{target}, " +
+          "whom he knows to be innocent"
+      end
 
-    known_werewolves.include?(target) || super(target)
+      false
+    elsif known_werewolves.include?(target)
+      puts "#{self} votes to lynch #{target}, " +
+        "whom he knows to be a werewolf"
+
+      true
+    else
+      super(target)
+    end
   end
 
   def see
     candidates = @game.players - @knowledge
 
-    target = candidates.any? ? candidates.sample : self
+    return if candidates.none?
+
+    target = candidates.sample
 
     @knowledge << target
 
     puts "#{target} is being investigated by #{self}"
-    puts "#{self} currently knows: #{(knowledge - [self]).join(", ")}"
+    puts "#{self} currently knows: #{(@knowledge - [self]).join(", ")}"
   end
 
   private
@@ -139,7 +169,16 @@ class Healer < Person
   end
 
   def vote(target)
-    @known_innocents.include?(target) ? false : random_boolean
+    if @known_innocents.include? target
+      if target != self
+        puts "#{self} votes to save #{target}, " +
+          "whom he knows to be innocent"
+      end
+
+      false
+    else
+      random_boolean
+    end
   end
 
   def heal
