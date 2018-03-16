@@ -2,7 +2,9 @@ require 'byebug'
 require_relative 'game'
 
 RUNS = 1
-ROLES = { Werewolf => 2, Villager => 12, Seer => 1, Healer => 1 }
+ROLES = {
+  Werewolf => 2, Villager => 6, Seer => 1, Healer => 1, Mason => 2
+}
 
 results = {:innocents => 0, :werewolves => 0}
 

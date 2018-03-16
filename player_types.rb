@@ -1,8 +1,6 @@
 require 'colorize'
 
 class Person
-  attr_reader :id
-
   def initialize(id, game)
     @id = id
     @game = game
@@ -52,11 +50,25 @@ class Villager < Person
   end
 end
 
+class Mason < Person
+  def to_s
+    "#{super} (mason)".green
+  end
+
+  def accuse
+    (@game.players - @game.masons).sample
+  end
+
+  def vote(target)
+    @game.masons.include?(target) ? false : random_boolean
+  end
+end
+
 class Seer < Person
   attr_reader :knowledge
 
   def to_s
-    super.blue
+    "#{super} (seer)".green
   end
 
   def initialize(id, game)
@@ -70,14 +82,11 @@ class Seer < Person
   end
 
   def accuse
-    candidates =
-      if known_werewolves.any?
-        known_werewolves
-      else
-        @game.players - known_innocents
-      end
-
-    candidates.sample
+    if known_werewolves.any?
+      known_werewolves.sample
+    else
+      (@game.players - known_innocents).sample
+    end
   end
 
   def vote(target)
@@ -86,14 +95,15 @@ class Seer < Person
     known_werewolves.include?(target) || super(target)
   end
 
-  def seeing_target
+  def see
     candidates = @game.players - @knowledge
 
-    candidates.any? ? candidates.sample : self
-  end
+    target = candidates.any? ? candidates.sample : self
 
-  def update_knowledge(player)
-    @knowledge << player
+    @knowledge << target
+
+    puts "#{target} is being investigated by #{self}"
+    puts "#{self} currently knows: #{(knowledge - [self]).join(", ")}"
   end
 
   private
@@ -108,14 +118,16 @@ class Seer < Person
 end
 
 class Healer < Person
+  attr_reader :target
+
   def initialize(id, game)
-    @known_innocents = [id]
+    @known_innocents = [self]
 
     super(id, game)
   end
 
   def to_s
-    super.yellow
+    "#{super} (healer)".green
   end
 
   def sync
@@ -130,7 +142,15 @@ class Healer < Person
     @known_innocents.include?(target) ? false : random_boolean
   end
 
-  def update_knowledge(player)
-    @known_innocents << player
+  def heal
+    @target = @game.players.sample
+
+    puts "#{@target} is being protected by #{self}"
+  end
+
+  def save
+    @known_innocents << @target
+
+    puts "#{@target} has been saved by #{self}"
   end
 end
