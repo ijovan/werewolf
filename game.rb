@@ -1,4 +1,7 @@
-ROLES = ["werewolf", "villager", "healer", "seer", "mason", "scapegoat"]
+ROLES = [
+  "werewolf", "villager", "healer", "seer",
+  "mason", "scapegoat", "rabble_rouser"
+]
 ROLES.each { |role| require_relative "roles/#{role}" }
 
 class Game
@@ -9,7 +12,7 @@ class Game
     "Judy", "Mel", "Sylvia", "Pat", "George", "Nick", "Mat", "Monica"
   ]
 
-  INNOCENT_TYPES = [Villager, Healer, Seer, Mason, Scapegoat]
+  INNOCENT_TYPES = [Villager, Healer, Seer, Mason, Scapegoat, RabbleRouser]
 
   LYNCH_LIMIT = 3
 
@@ -63,6 +66,10 @@ class Game
     select_by_type(Scapegoat).first
   end
 
+  def rabble_rouser
+    select_by_type(RabbleRouser).first
+  end
+
   def run
     while !@winner
       run_day
@@ -81,6 +88,12 @@ class Game
     puts; puts "--- Day #{@day} begins --- #{stats}"; puts
 
     run_lynching
+
+    if rabble_rouser
+      puts; puts "#{rabble_rouser} entices the crowd into another lynch"
+
+      run_lynching
+    end
   end
 
   def run_night
@@ -170,7 +183,7 @@ class Game
       werewolves.count.to_s.red, villagers.count.to_s.green,
       seer ? "Se".green : nil, healer ? "H".green : nil,
       masons.any? ? ("M".green * masons.count) : nil,
-      scapegoat ? "Sc".green : nil
+      scapegoat ? "Sc".green : nil, rabble_rouser ? "R".green : nil
     ]
 
     tokens.compact.join(" ")
