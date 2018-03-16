@@ -5,11 +5,13 @@ class Werewolf < Person
     super.red
   end
 
-  def accuse
+  protected
+
+  def accusation_target
     (@game.players - @game.werewolves).sample
   end
 
-  def vote(target)
+  def vote_decision(target)
     if @game.werewolves.include? target
       if target != self
         puts "#{self} votes to save #{target}, a fellow werewolf"

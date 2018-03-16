@@ -17,23 +17,6 @@ class Healer < Villager
     @known_innocents.select! { |player| @game.players.include? player }
   end
 
-  def accuse
-    (@game.players - @known_innocents).sample
-  end
-
-  def vote(target)
-    if @known_innocents.include? target
-      if target != self
-        puts "#{self} votes to save #{target}, " +
-          "whom he knows to be innocent"
-      end
-
-      false
-    else
-      random_boolean
-    end
-  end
-
   def heal
     @target = @game.players.sample
 
@@ -44,5 +27,24 @@ class Healer < Villager
     @known_innocents << @target
 
     puts "#{@target} has been saved by #{self}"
+  end
+
+  protected
+
+  def accusation_target
+    (@game.players - @known_innocents).sample
+  end
+
+  def vote_decision(target)
+    if @known_innocents.include? target
+      if target != self
+        puts "#{self} votes to save #{target}, " +
+          "whom he knows to be innocent"
+      end
+
+      false
+    else
+      random_boolean
+    end
   end
 end

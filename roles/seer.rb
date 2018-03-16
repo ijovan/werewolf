@@ -17,7 +17,22 @@ class Seer < Villager
     @knowledge.select! { |player| @game.players.include?(player) }
   end
 
-  def accuse
+  def see
+    candidates = @game.players - @knowledge
+
+    return if candidates.none?
+
+    target = candidates.sample
+
+    @knowledge << target
+
+    puts "#{target} is being investigated by #{self}"
+    puts "#{self} currently knows: #{(@knowledge - [self]).join(", ")}"
+  end
+
+  protected
+
+  def accusation_target
     if known_werewolves.any?
       known_werewolves.sample
     else
@@ -25,7 +40,7 @@ class Seer < Villager
     end
   end
 
-  def vote(target)
+  def vote_decision(target)
     if known_innocents.include? target
       if target != self
         puts "#{self} votes to save #{target}, " +
@@ -41,19 +56,6 @@ class Seer < Villager
     else
       super(target)
     end
-  end
-
-  def see
-    candidates = @game.players - @knowledge
-
-    return if candidates.none?
-
-    target = candidates.sample
-
-    @knowledge << target
-
-    puts "#{target} is being investigated by #{self}"
-    puts "#{self} currently knows: #{(@knowledge - [self]).join(", ")}"
   end
 
   private

@@ -5,11 +5,13 @@ class Mason < Villager
     "#{super} (mason)".green
   end
 
-  def accuse
+  protected
+
+  def accusation_target
     (@game.players - @game.masons).sample
   end
 
-  def vote(target)
+  def vote_decision(target)
     if @game.masons.include? target
       if target != self
         puts "#{self} votes to save #{target}, a fellow mason"
