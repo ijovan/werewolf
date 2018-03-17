@@ -55,7 +55,12 @@ class Seer < Villager
   end
 
   def vote_decision(target)
-    if known_innocents.include? target
+    if @game.players == @game.players & known_innocents
+      puts "#{self} is confused by his findings not adding up " +
+        "and disregards them"
+
+      super(target)
+    elsif known_innocents.include? target
       if target != self
         if target.class == AlphaWerewolf
           puts "#{self} votes to save #{target}, " +
