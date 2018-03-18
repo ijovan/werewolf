@@ -6,7 +6,7 @@ class Hunter < Villager
   end
 
   def shoot
-    candidates = @game.players - [self]
+    candidates = @players.alive - [self]
 
     target = candidates.shuffle.max { |player| suspicion_level player }
 
@@ -21,5 +21,15 @@ class Hunter < Villager
 
       nil
     end
+  end
+
+  def die(cause = DeathCause::IRRELEVANT)
+    target = self.shoot
+    target.die if target
+
+    @players.innocent_victims << self
+    @players.innocent_victims.uniq!
+
+    super(cause)
   end
 end

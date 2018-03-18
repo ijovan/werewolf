@@ -5,7 +5,7 @@ class Werewolf < Person
     super.red
   end
 
-  def kill_target
+  def kill
     target = known_innocents.shuffle.min do |player|
       suspicion_level(player)
     end
@@ -15,17 +15,21 @@ class Werewolf < Person
         "a special innocent"
     end
 
-    target
+    target.die(DeathCause::WEREWOLVES)
+
+    return if @players.alive.include? target
+
+    puts "#{target} has been killed by the werewolves"
   end
 
   protected
 
   def known_innocents
-    @game.innocents
+    @players.innocents
   end
 
   def accusation_target
-    candidates = @game.players - @game.werewolf_pack
+    candidates = @players.alive - @players.werewolf_pack
 
     target = candidates.shuffle.min { |player| suspicion_level player }
 
@@ -40,15 +44,15 @@ class Werewolf < Person
   end
 
   def vote_decision(target)
-    if @game.werewolf_pack.include? target
+    if @players.werewolf_pack.include? target
       if target != self
         puts "#{self} votes to save #{target}, a fellow werewolf"
       end
 
-      false
-    else
-      true
+      return false
     end
+
+    true
   end
 end
 

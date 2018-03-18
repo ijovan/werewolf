@@ -7,18 +7,18 @@ class Seer < Villager
     "#{super} (seer)".green
   end
 
-  def initialize(id, game)
+  def initialize(id, players)
     @knowledge = [self]
 
-    super(id, game)
+    super(id, players)
   end
 
   def sync
-    @knowledge.select! { |player| @game.players.include?(player) }
+    @knowledge.select! { |player| @players.alive.include?(player) }
   end
 
   def see
-    candidates = @game.players - @knowledge
+    candidates = @players.alive - @knowledge
 
     return if candidates.none?
 
@@ -43,43 +43,27 @@ class Seer < Villager
 
     target = known_werewolves.sample
 
-    if target.class == Miller
-      puts "#{self} erroneously believes that #{target} is a werewolf " +
-        "and accuses him"
-    else
-      puts "#{self} correctly believes that #{target} is a werewolf " +
-        "and accuses him"
-    end
+    puts "#{self} believes that #{target} is a werewolf and accuses him"
 
     target
   end
 
   def vote_decision(target)
-    if @game.players == @game.players & known_innocents
+    if @players.alive == @players.alive & known_innocents
       puts "#{self} is confused by his findings not adding up " +
         "and disregards them"
 
       super(target)
     elsif known_innocents.include? target
       if target != self
-        if target.class == AlphaWerewolf
-          puts "#{self} votes to save #{target}, " +
-            "whom he erroneously believes to be innocent"
-        else
-          puts "#{self} votes to save #{target}, " +
-            "whom he correctly believes to be innocent"
-        end
+        puts "#{self} votes to save #{target}, " +
+          "whom he believes to be innocent"
       end
 
       false
     elsif known_werewolves.include?(target)
-      if target.class == Miller
-        puts "#{self} votes to lynch #{target}, " +
-          "whom he erroneously believes to be a werewolf"
-      else
-        puts "#{self} votes to lynch #{target}, " +
-          "whom he correctly believes to be a werewolf"
-      end
+      puts "#{self} votes to lynch #{target}, " +
+        "whom he believes to be a werewolf"
 
       true
     else

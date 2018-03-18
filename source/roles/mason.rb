@@ -8,11 +8,11 @@ class Mason < Villager
   protected
 
   def known_innocents
-    @game.masons
+    @players.masons
   end
 
   def vote_decision(target)
-    if @game.masons.include? target
+    if @players.masons.include? target
       if target != self
         puts "#{self} votes to save #{target}, a fellow mason"
       end

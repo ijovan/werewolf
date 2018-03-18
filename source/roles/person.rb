@@ -1,11 +1,18 @@
 require 'colorize'
 
 class Person
+  class DeathCause
+    IRRELEVANT = 0
+    WEREWOLVES = 1
+    LYNCH = 2
+    SCAPEGOATING = 3
+  end
+
   attr_reader :vote_history
 
-  def initialize(id, game)
+  def initialize(id, players)
     @id = id
-    @game = game
+    @players = players
     @vote_history = { :lynch => [], :no_lynch => [] }
   end
 
@@ -16,15 +23,29 @@ class Person
   def sync
   end
 
-  def accuse
-    target = accusation_target
+  def die(cause = DeathCause::IRRELEVANT)
+    if cause == DeathCause::WEREWOLVES
+      healer = @players.healer
 
-    @vote_history[:lynch] << target if target
+      return healer.save if healer && healer.safe?(self)
 
-    target
+      @players.innocent_victims << self
+    end
+
+    @players.remove self
   end
 
-  def vote(target)
+  def accuse(lynch)
+    target = accusation_target
+
+    return unless target
+
+    @vote_history[:lynch] << target
+
+    lynch.accuse(self, target)
+  end
+
+  def vote(lynch, target)
     decision = vote_decision(target)
 
     if decision
@@ -33,23 +54,23 @@ class Person
       @vote_history[:no_lynch] << target
     end
 
-    decision
+    lynch.cast_vote(self, decision)
   end
 
   protected
 
   def average_suspicion
-    players = @game.players
+    suspicion_levels = @players.alive.map do |player|
+      suspicion_level(player).to_f
+    end
 
-    suspicion_levels = players.map { |player| suspicion_level(player).to_f }
-
-    suspicion_levels.inject(:+) / players.count
+    suspicion_levels.inject(:+) / @players.alive.count
   end
 
   def suspicion_level(target)
     votes = target.vote_history
 
-    innocents = known_innocents + @game.innocent_victims
+    innocents = known_innocents + @players.innocent_victims
 
     intersection(votes[:lynch], innocents).count -
       intersection(votes[:no_lynch], innocents).count

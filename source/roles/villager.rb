@@ -8,7 +8,7 @@ class Villager < Person
   protected
 
   def accusation_target
-    candidates = @game.players - known_innocents
+    candidates = @players.alive - known_innocents
 
     target = candidates.shuffle.max { |player| suspicion_level player }
 

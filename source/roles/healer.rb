@@ -1,12 +1,10 @@
 require_relative 'villager'
 
 class Healer < Villager
-  attr_reader :target
-
-  def initialize(id, game)
+  def initialize(id, players)
     @known_innocents = [self]
 
-    super(id, game)
+    super(id, players)
   end
 
   def to_s
@@ -14,13 +12,15 @@ class Healer < Villager
   end
 
   def sync
-    @known_innocents.select! { |player| @game.players.include? player }
+    @known_innocents.select! do |player|
+      @players.alive.include? player
+    end
   end
 
   def heal
     average = average_suspicion
 
-    assumed_innocents = @game.players.select do |player|
+    assumed_innocents = @players.alive.select do |player|
       player == self || suspicion_level(player) <= average
     end
 
@@ -32,6 +32,10 @@ class Healer < Villager
       puts "#{self} currenty knows: " +
         (@known_innocents - [self]).join(", ")
     end
+  end
+
+  def safe?(person)
+    person == @target
   end
 
   def save
