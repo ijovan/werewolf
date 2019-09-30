@@ -1,6 +1,6 @@
 # Werewolf
 
-Generates summaries of AI-only games of
+Generates summaries of bot-only games of
 [Werewolf/Mafia](https://en.wikipedia.org/wiki/Mafia_(party_game)).
 
 Run the game with `bundle exec ruby app.rb` and watch the computer players try
